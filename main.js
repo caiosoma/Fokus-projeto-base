@@ -7,15 +7,19 @@ const titulo = document.querySelector('.app__title')
 const botoes = document.querySelectorAll('.app__card-button')
 const startButton = document.querySelector('#start-pause')
 const musicaFocoInput = document.querySelector('#alternar-musica')
+const startPauseCountBt = document.querySelector('#start-pause span')
+const countIcon = document.querySelector('.app__card-primary-butto-icon')
+const timer = document.querySelector('#timer')
 const musica = new Audio('./sons/luna-rise-part-one.mp3')
 const startSound = new Audio('./sons/play.wav')
 const pauseSound = new Audio('./sons/pause.mp3')
 
-let countdownMinutes = 5
+let countdownMinutes = 1500
 let intervalId = null
 
 // FUNCTION CREATED IN ORDER TO AVOID THE REPETITION OF SAME BUTTON CLICK CODES 
 function alterarContexto(contexto) {
+    timerCount()
     botoes.forEach(function (botao) {
         botao.classList.remove('active')
     })
@@ -49,16 +53,19 @@ function alterarContexto(contexto) {
 
 // CONTEXT BUTTONS
 focoButton.addEventListener('click', () => {
+    countdownMinutes = 1500
     alterarContexto('foco');
     focoButton.classList.add('active')
 })
 
 curtoButton.addEventListener('click', () => {
+    countdownMinutes = 300
     alterarContexto('descanso-curto')
     curtoButton.classList.add('active')
 })
 
 longoButton.addEventListener('click', () => {
+    countdownMinutes = 900
     alterarContexto('descanso-longo')
     longoButton.classList.add('active')
 })
@@ -77,30 +84,45 @@ musica.loop = true; // "PLEASE DON'T STOP THE MUSIC"
 
 // COUNTDOWN METHOD
 const countdown = () => {
-    if(countdownMinutes <=0){
+    if (countdownMinutes <= 0) {
         pauseSound.play() // EXTERNAL SOUND
         zero()
-        alert('Time out!')
+        startPauseCountBt.textContent = 'Começar'
+        countIcon.setAttribute('src', './imagens/play_arrow.png')
         return
     }
     countdownMinutes -= 1
+    timerCount()
 }
 
-startButton.addEventListener ('click', startCount)
+startButton.addEventListener('click', startCount)
 
-function startCount () {
-    if(intervalId){
+function startCount() {
+    if (intervalId) {
         pauseSound.play()
         zero()
         return
     }
     startSound.play() // EXTERNAL SOUND
     intervalId = setInterval(countdown, 1000)
+    startPauseCountBt.textContent = 'Pausar'
+    countIcon.setAttribute('src', './imagens/pause.png')
+
 }
 
-function zero () {
+function zero() {
     clearInterval(intervalId)
+    startPauseCountBt.textContent = 'Retomar'
+    countIcon.setAttribute('src', './imagens/play_arrow.png')
     intervalId = null
 }
 // END OF COUNTDOWN METHOD 
 
+// TIMER
+function timerCount() {
+    const time = new Date(countdownMinutes * 1000)
+    const finalTimer = time.toLocaleString('pt-br', { minute: '2-digit', second: '2-digit' }) // FORMAT THE TIME PRINTED FROM MILISECOND TO "MINUTE MODE"
+    timer.innerHTML = `${finalTimer}`
+}
+
+timerCount()
